@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Recipe {
+  id              String        @id @default(cuid())
+  url             String        @unique
+  title           String
+  description     String?
+
+  prepTime        Int?          // minutes
+  cookTime        Int?
+  totalTime       Int?
+  servings        Int?
+  yield           String?
+
+  ingredients     Json          // Array of ingredient objects
+  instructions    Json          // Array of steps
+  notes           String?
+
+  images          RecipeImage[]
+  mainImageUrl    String?
+
+  categories      String[]      // ["dinner", "italian"]
+  cuisine         String?
+  dietary         String[]      // ["vegetarian", "gluten-free"]
+
+  siteName        String?
+  author          String?
+  datePublished   DateTime?
+
+  rawData         Json?         // Original scraped data
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  rating          Int?          // Personal rating 1-5
+  tags            Tag[]
+  isFavorite      Boolean       @default(false)
+
+  @@index([title])
+}
+
+model RecipeImage {
+  id          String   @id @default(cuid())
+  recipeId    String
+  recipe      Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  url         String
+  localPath   String?
+  alt         String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  @@index([recipeId])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  recipes   Recipe[]
+  createdAt DateTime @default(now())
+}
+
+model ImportJob {
+  id            String   @id @default(cuid())
+  url           String
+  status        String   // pending, processing, completed, failed
+  errorMessage  String?
+  recipeId      String?
+  createdAt     DateTime @default(now())
+  completedAt   DateTime?
+
+  @@index([status])
+}
