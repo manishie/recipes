@@ -12,7 +12,7 @@ interface JsonLdRecipe {
   recipeYield?: string | number;
   recipeIngredient?: string[];
   recipeInstructions?: any[];
-  recipeCuisine?: string;
+  recipeCuisine?: string | string[];
   recipeCategory?: string | string[];
   keywords?: string;
   author?: { name: string } | string;
@@ -153,7 +153,7 @@ export async function scrapeJsonLd(html: string, url: string): Promise<RecipeDat
     mainImageUrl: images[0]?.url,
 
     categories,
-    cuisine: recipe.recipeCuisine,
+    cuisine: Array.isArray(recipe.recipeCuisine) ? recipe.recipeCuisine.join(', ') : recipe.recipeCuisine,
     dietary,
 
     siteName,
