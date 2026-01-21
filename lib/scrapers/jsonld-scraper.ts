@@ -112,19 +112,22 @@ export async function scrapeJsonLd(html: string, url: string): Promise<RecipeDat
 
   if (!recipeData) return null;
 
+  // Type assertion to help TypeScript after null check
+  const recipe = recipeData as JsonLdRecipe;
+
   // Extract page title as fallback
   const pageTitle = $('title').text() || $('meta[property="og:title"]').attr('content') || '';
   const siteName = $('meta[property="og:site_name"]').attr('content') || new URL(url).hostname;
 
   // Parse the recipe data
-  const images = normalizeImages(recipeData.image);
-  const categories = Array.isArray(recipeData.recipeCategory)
-    ? recipeData.recipeCategory
-    : recipeData.recipeCategory
-      ? [recipeData.recipeCategory]
+  const images = normalizeImages(recipe.image);
+  const categories = Array.isArray(recipe.recipeCategory)
+    ? recipe.recipeCategory
+    : recipe.recipeCategory
+      ? [recipe.recipeCategory]
       : [];
 
-  const keywords = recipeData.keywords?.split(',').map(k => k.trim()) || [];
+  const keywords = recipe.keywords?.split(',').map(k => k.trim()) || [];
   const dietary = keywords.filter(k =>
     k.toLowerCase().includes('vegetarian') ||
     k.toLowerCase().includes('vegan') ||
@@ -133,30 +136,30 @@ export async function scrapeJsonLd(html: string, url: string): Promise<RecipeDat
   );
 
   return {
-    title: recipeData.name || pageTitle,
-    description: recipeData.description,
+    title: recipe.name || pageTitle,
+    description: recipe.description,
     url,
 
-    prepTime: recipeData.prepTime ? parseISODuration(recipeData.prepTime) : undefined,
-    cookTime: recipeData.cookTime ? parseISODuration(recipeData.cookTime) : undefined,
-    totalTime: recipeData.totalTime ? parseISODuration(recipeData.totalTime) : undefined,
-    servings: typeof recipeData.recipeYield === 'number' ? recipeData.recipeYield : undefined,
-    yield: String(recipeData.recipeYield || ''),
+    prepTime: recipe.prepTime ? parseISODuration(recipe.prepTime) : undefined,
+    cookTime: recipe.cookTime ? parseISODuration(recipe.cookTime) : undefined,
+    totalTime: recipe.totalTime ? parseISODuration(recipe.totalTime) : undefined,
+    servings: typeof recipe.recipeYield === 'number' ? recipe.recipeYield : undefined,
+    yield: String(recipe.recipeYield || ''),
 
-    ingredients: recipeData.recipeIngredient || [],
-    instructions: normalizeInstructions(recipeData.recipeInstructions || []),
+    ingredients: recipe.recipeIngredient || [],
+    instructions: normalizeInstructions(recipe.recipeInstructions || []),
 
     images,
     mainImageUrl: images[0]?.url,
 
     categories,
-    cuisine: recipeData.recipeCuisine,
+    cuisine: recipe.recipeCuisine,
     dietary,
 
     siteName,
-    author: typeof recipeData.author === 'string' ? recipeData.author : recipeData.author?.name,
-    datePublished: recipeData.datePublished,
+    author: typeof recipe.author === 'string' ? recipe.author : recipe.author?.name,
+    datePublished: recipe.datePublished,
 
-    rawData: recipeData,
+    rawData: recipe,
   };
 }

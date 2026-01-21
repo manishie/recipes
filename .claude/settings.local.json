@@ -7,7 +7,11 @@
       "Bash(npx prisma init)",
       "Bash(npx prisma generate:*)",
       "Bash(npm uninstall:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(npm run build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)"
     ]
   }
 }

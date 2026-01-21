@@ -11,11 +11,12 @@ const updateSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const recipe = await prisma.recipe.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         images: {
           orderBy: { order: 'asc' },
@@ -47,9 +48,10 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const data = updateSchema.parse(body);
 
@@ -76,7 +78,7 @@ export async function PATCH(
     }
 
     const recipe = await prisma.recipe.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...recipeData,
         ...(tagConnect && { tags: tagConnect }),
@@ -110,11 +112,12 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await prisma.recipe.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({

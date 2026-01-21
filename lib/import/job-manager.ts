@@ -18,7 +18,7 @@ export async function createImportJob(url: string): Promise<ImportJob> {
       url,
       status: 'pending',
     },
-  });
+  }) as ImportJob;
 }
 
 export async function createBulkImportJobs(urls: string[]): Promise<ImportJob[]> {
@@ -39,7 +39,7 @@ export async function createBulkImportJobs(urls: string[]): Promise<ImportJob[]>
       createdAt: 'desc',
     },
     take: urls.length,
-  });
+  }) as ImportJob[];
 }
 
 export async function updateJobStatus(
@@ -58,7 +58,7 @@ export async function updateJobStatus(
       recipeId: data?.recipeId,
       completedAt: status === 'completed' || status === 'failed' ? new Date() : undefined,
     },
-  });
+  }) as ImportJob;
 }
 
 export async function getPendingJobs(limit: number = 10): Promise<ImportJob[]> {
@@ -66,19 +66,19 @@ export async function getPendingJobs(limit: number = 10): Promise<ImportJob[]> {
     where: { status: 'pending' },
     orderBy: { createdAt: 'asc' },
     take: limit,
-  });
+  }) as ImportJob[];
 }
 
 export async function getAllJobs(): Promise<ImportJob[]> {
   return await prisma.importJob.findMany({
     orderBy: { createdAt: 'desc' },
-  });
+  }) as ImportJob[];
 }
 
 export async function getJobById(jobId: string): Promise<ImportJob | null> {
   return await prisma.importJob.findUnique({
     where: { id: jobId },
-  });
+  }) as ImportJob | null;
 }
 
 export async function getJobStats() {
